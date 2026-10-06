@@ -1,0 +1,45 @@
+{
+  "name": "SOLARIX — Calculadora Solar Fotovoltaica",
+  "short_name": "SOLARIX",
+  "description": "Calculadora y dimensionamiento profesional de instalaciones solares fotovoltaicas, paneles, inversores y almacenamiento en baterías.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f0c1b",
+  "theme_color": "#6d35b8",
+  "lang": "es-MX",
+  "categories": ["utilities", "productivity", "tools"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

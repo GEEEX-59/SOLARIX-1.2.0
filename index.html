@@ -1,0 +1,966 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SOLARIX — Calculadora Solar PWA</title>
+<meta name="description" content="Calculadora y dimensionamiento profesional de instalaciones solares fotovoltaicas. PWA instalable para dispositivos móviles y escritorio.">
+
+<!-- PWA & Mobile Meta Tags -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6d35b8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOLARIX">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+<link rel="shortcut icon" href="icons/favicon-64.png">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #6d35b8;
+  --primary-hover: #58289c;
+  --primary-gradient: linear-gradient(135deg, #4b1f83 0%, #6d35b8 50%, #8d5bd1 100%);
+  --accent-gold: #ffb703;
+  --accent-orange: #fb8500;
+  --accent-cyan: #00b4d8;
+  --bg-gradient: linear-gradient(180deg, #0f0c1b 0%, #17122b 300px, #f4f0fa 300px, #f4f0fa 100%);
+  --bg-card: #ffffff;
+  --txt-main: #1f162e;
+  --txt-muted: #6c6377;
+  --border-color: #e6def2;
+  --shadow-sm: 0 4px 12px rgba(60, 25, 85, 0.05);
+  --shadow-md: 0 10px 30px rgba(60, 25, 85, 0.08);
+  --shadow-lg: 0 20px 40px rgba(60, 25, 85, 0.12);
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--txt-main);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* Header & Navbar */
+header {
+  background: var(--primary-gradient);
+  color: white;
+  padding: 24px 20px 36px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(43, 15, 78, 0.3);
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 183, 3, 0.25) 0%, rgba(255, 183, 3, 0) 70%);
+  pointer-events: none;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-title h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff 0%, #ffd6a5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-title .sub {
+  font-size: 13px;
+  opacity: 0.9;
+  font-weight: 500;
+  margin-top: 2px;
+  color: #e4d8f5;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* PWA Install Button */
+.btn-install {
+  background: linear-gradient(135deg, #ffb703 0%, #fb8500 100%);
+  color: #170c26;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 18px rgba(251, 133, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pulse-glow 2.5s infinite;
+}
+
+.btn-install:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(251, 133, 0, 0.5);
+}
+
+.btn-install:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 4px 18px rgba(251, 133, 0, 0.4); }
+  50% { box-shadow: 0 6px 26px rgba(255, 183, 3, 0.7); }
+}
+
+.badge-status {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ecc71;
+}
+
+/* Main Layout */
+main {
+  max-width: 1200px;
+  margin: -15px auto 0 auto;
+  padding: 0 16px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(230, 222, 242, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f2ecf9;
+}
+
+.num {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--primary-gradient);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(109, 53, 184, 0.3);
+}
+
+.section-title h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c1b4d;
+  margin: 0;
+}
+
+/* Form Grid */
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--txt-muted);
+  margin-bottom: 6px;
+}
+
+.field input, .field select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #dfd5ed;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--txt-main);
+  transition: all 0.2s ease;
+}
+
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(109, 53, 184, 0.12);
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e8e0f2;
+  margin-top: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+  background: #fff;
+}
+
+th {
+  background: #f5f0fb;
+  color: #4b3065;
+  text-align: left;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0ea9833;
+  border-bottom: 1px solid #f0e8f8;
+  font-size: 14px;
+}
+
+td input {
+  width: 100%;
+  padding: 9px;
+  border: 1.5px solid #e2d8ef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+td input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Buttons */
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 18px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(109, 53, 184, 0.25);
+}
+
+.primary:hover { background: var(--primary-hover); }
+
+.secondary {
+  background: #efe7f8;
+  color: #4b3065;
+}
+
+.secondary:hover { background: #e3d3f4; }
+
+.danger {
+  background: #ffebeb;
+  color: #d32f2f;
+  border: 1px solid #f5c2c2;
+}
+
+.danger:hover { background: #ffd6d6; }
+
+/* KPIs Grid */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.kpi {
+  background: linear-gradient(135deg, #fdfbfd 0%, #f6f0fb 100%);
+  border: 1px solid #ebdcf7;
+  border-radius: 14px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.kpi:hover {
+  transform: translateY(-2px);
+  border-color: #d6bbf0;
+}
+
+.kpi span {
+  display: block;
+  color: var(--txt-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kpi b {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  margin-top: 6px;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.note, .formula {
+  background: #f8f4fc;
+  border-left: 4px solid var(--primary);
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-top: 16px;
+  line-height: 1.6;
+  font-size: 14px;
+  color: #3b2f4c;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.history-item {
+  padding: 14px 18px;
+  background: #faf7fd;
+  border: 1px solid #eadff3;
+  border-radius: 12px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+/* PWA Modal Banner for iOS / Desktop instructions */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 12, 27, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  text-align: center;
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
+}
+
+.modal-card img.modal-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  margin-bottom: 14px;
+}
+
+.modal-card h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  color: var(--txt-main);
+  margin-bottom: 8px;
+}
+
+.modal-card p {
+  color: var(--txt-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.ios-steps {
+  text-align: left;
+  background: #f7f3fb;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.ios-steps ol {
+  padding-left: 20px;
+}
+
+.ios-steps li {
+  margin-bottom: 8px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 30px 20px 10px;
+  color: var(--txt-muted);
+  font-size: 13px;
+}
+
+footer a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Mobile & Print Responsiveness */
+@media (max-width: 900px) {
+  .grid3 { grid-template-columns: repeat(2, 1fr); }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  header { padding: 20px 16px 30px; }
+  .grid2, .grid3, .kpis { grid-template-columns: 1fr; }
+  .header-container { flex-direction: column; align-items: flex-start; }
+  .header-actions { width: 100%; justify-content: space-between; margin-top: 10px; }
+  .btn-install { width: 100%; justify-content: center; padding: 12px; }
+  .card { padding: 18px 14px; }
+}
+
+@media print {
+  .no-print, header, .btn, .modal-overlay, footer { display: none !important; }
+  body { background: #fff; color: #000; }
+  main { margin: 0; padding: 0; max-width: 100%; }
+  .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="icons/favicon.svg" alt="SOLARIX Logo">
+      </div>
+      <div class="brand-title">
+        <h1>SOLARIX</h1>
+        <div class="sub">Calculadora & Dimensionamiento Solar PWA</div>
+      </div>
+    </div>
+
+    <div class="header-actions no-print">
+      <div id="connectionStatus" class="badge-status">
+        <span class="status-dot"></span> <span id="statusText">En línea</span>
+      </div>
+      <button id="pwaInstallBtn" class="btn-install" style="display: none;" onclick="triggerPwaInstall()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Instalar App</span>
+      </button>
+      <div id="installedBadge" class="badge-status" style="display: none; background: rgba(46, 204, 113, 0.2); border-color: rgba(46, 204, 113, 0.4);">
+        ✓ App Instalada
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 1. DATOS DEL SISTEMA SOLAR -->
+  <div class="card">
+    <div class="section-title">
+      <div class="num">1</div>
+      <h2>Datos del sistema solar</h2>
+    </div>
+    <div class="grid3">
+      <div class="field">
+        <label for="sun">Horas de sol pleno / día (HSP)</label>
+        <input id="sun" type="number" step=".001" value="6">
+      </div>
+      <div class="field">
+        <label for="eff">Eficiencia del sistema (%)</label>
+        <input id="eff" type="number" step=".001" value="60">
+      </div>
+      <div class="field">
+        <label for="panel">Potencia de cada panel (W)</label>
+        <input id="panel" type="number" step=".001" value="550">
+      </div>
+      <div class="field">
+        <label for="sysv">Voltaje del sistema (V)</label>
+        <input id="sysv" type="number" step=".001" value="48">
+      </div>
+      <div class="field">
+        <label for="days">Días de gracia / autonomía</label>
+        <input id="days" type="number" step=".001" value="3">
+      </div>
+      <div class="field">
+        <label for="project">Nombre del proyecto</label>
+        <input id="project" placeholder="Ej. Casa de campo solar">
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DATOS DE VIVIENDA / CONSUMO -->
+  <div class="card">
+    <div class="section-title">
+      <div class="num">2</div>
+      <h2>Datos de vivienda y equipos</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Equipo</th>
+            <th>Cantidad</th>
+            <th>Voltaje (V)</th>
+            <th>Corriente (A)</th>
+            <th>Potencia (W)</th>
+            <th>Horas / día</th>
+            <th>Energía (Wh/día)</th>
+            <th class="no-print">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="toolbar no-print" style="margin-top:16px">
+      <button class="btn primary" onclick="addRow()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar equipo
+      </button>
+    </div>
+    <div class="note">
+      💡 <b>Nota:</b> Puedes modificar corriente (A) o potencia (W). SOLARIX recalcula el otro valor automáticamente sin perder el foco. Los valores se formatean a 3 decimales.
+    </div>
+  </div>
+
+  <!-- 3. RESULTADOS DE SOLARIX -->
+  <div class="card">
+    <div class="section-title">
+      <div class="num">3</div>
+      <h2>Resultados de SOLARIX</h2>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Energía real diaria</span><b id="daily">0 Wh</b></div>
+      <div class="kpi"><span>Energía de diseño</span><b id="design">0 Wh</b></div>
+      <div class="kpi"><span>Paneles necesarios</span><b id="panels">0</b></div>
+      <div class="kpi"><span>Potencia solar instalada</span><b id="installed">0 W</b></div>
+      <div class="kpi"><span>Energía almacenada</span><b id="storage">0 Wh</b></div>
+      <div class="kpi"><span>Corriente total</span><b id="totalA">0 A</b></div>
+      <div class="kpi"><span>Potencia solar requerida</span><b id="pvreq">0 W</b></div>
+      <div class="kpi"><span>Días de autonomía</span><b id="autonomy">0 días</b></div>
+    </div>
+    <div class="formula" id="resultFormula"></div>
+  </div>
+
+  <!-- 4. ENERGÍA POR PERIODO -->
+  <div class="card">
+    <div class="section-title">
+      <div class="num">4</div>
+      <h2>Energía por periodo</h2>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Por día</span><b id="eDay">0 Wh</b></div>
+      <div class="kpi"><span>Por semana (7 días)</span><b id="eWeek">0 Wh</b></div>
+      <div class="kpi"><span>Por mes (30 días)</span><b id="eMonth">0 Wh</b></div>
+      <div class="kpi"><span>Almacenamiento total</span><b id="eStore">0 Wh</b></div>
+    </div>
+  </div>
+
+  <!-- 5. DIMENSIONAMIENTO DE EQUIPOS -->
+  <div class="card">
+    <div class="section-title">
+      <div class="num">5</div>
+      <h2>Dimensionamiento de equipos</h2>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="batv">Voltaje del banco de baterías</label>
+        <select id="batv">
+          <option value="12">12 V</option>
+          <option value="24">24 V</option>
+          <option value="48" selected>48 V</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="dod">Profundidad de descarga max (%)</label>
+        <input id="dod" type="number" min="50" max="95" step="1" value="80">
+      </div>
+    </div>
+    <div class="kpis" style="margin-top:16px">
+      <div class="kpi"><span>🔋 Capacidad batería</span><b id="batAh">0 Ah</b></div>
+      <div class="kpi"><span>🔋 Energía banco</span><b id="batWh">0 Wh</b></div>
+      <div class="kpi"><span>⚡ Capacidad inversor</span><b id="inv">0 W</b></div>
+      <div class="kpi"><span>🔌 Controlador de carga</span><b id="ctrl">0 A</b></div>
+    </div>
+    <div class="formula" id="equipFormula"></div>
+  </div>
+
+  <!-- 6. HISTORIAL Y REPORTES -->
+  <div class="card no-print">
+    <div class="section-title">
+      <div class="num">6</div>
+      <h2>Historial de proyectos</h2>
+    </div>
+    <div id="history"></div>
+    <div class="toolbar" style="margin-top:16px">
+      <button class="btn primary" onclick="saveProject()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar proyecto
+      </button>
+      <button class="btn secondary" onclick="window.print()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Generar / Guardar PDF
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- Modal de instalación PWA / Instrucciones iOS -->
+<div id="pwaModal" class="modal-overlay">
+  <div class="modal-card">
+    <button class="close-modal" onclick="closePwaModal()">&times;</button>
+    <img src="icons/icon-192.png" alt="SOLARIX Icon" class="modal-icon">
+    <h3>Instalar SOLARIX PWA</h3>
+    <p id="modalDesc">Disfruta de SOLARIX como una aplicación nativa en tu dispositivo movil o escritorio, con acceso instantáneo y funcionamiento offline.</p>
+    
+    <div id="iosInstructions" class="ios-steps" style="display: none;">
+      <strong>Instrucciones para iOS (Safari):</strong>
+      <ol>
+        <li>Toca el botón <b>Compartir</b> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> en Safari.</li>
+        <li>Desplázate hacia abajo y selecciona <b>"Agregar a la pantalla de inicio"</b> ➕.</li>
+        <li>Toca <b>Agregar</b> en la esquina superior derecha.</li>
+      </ol>
+    </div>
+
+    <div class="toolbar" style="justify-content: center;">
+      <button id="modalInstallBtn" class="btn btn-install" onclick="executeInstallPrompt()">
+        Instalar Ahora
+      </button>
+      <button class="btn secondary" onclick="closePwaModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<footer class="no-print">
+  <p>SOLARIX PWA v1.2.0 — Calculadora Solar Fotovoltaica Off-Grid</p>
+</footer>
+
+<script>
+// --- Helper functions & Data ---
+const $ = id => document.getElementById(id);
+const N = x => Number(x) || 0;
+const R = x => Math.round(N(x) * 1000) / 1000;
+const F = x => R(x).toLocaleString('es-MX', { maximumFractionDigits: 3 });
+
+let data = [
+  ['Refrigerador', 1, 127, 3, 381, 8],
+  ['Televisión', 1, 127, 1, 127, 5],
+  ['Iluminación', 6, 127, .3, 38.1, 6]
+];
+
+function render() {
+  $('rows').innerHTML = data.map((r, i) => `<tr>
+    <td><input value="${r[0]}" oninput="data[${i}][0]=this.value"></td>
+    <td><input type="number" step=".001" value="${r[1]}" oninput="chg(${i},'q',this.value)"></td>
+    <td><input type="number" step=".001" value="${r[2]}" oninput="chg(${i},'v',this.value)"></td>
+    <td><input type="number" step=".001" value="${r[3]}" oninput="chg(${i},'a',this.value)"></td>
+    <td><input type="number" step=".001" value="${r[4]}" oninput="chg(${i},'p',this.value)"></td>
+    <td><input type="number" step=".001" value="${r[5]}" oninput="chg(${i},'h',this.value)"></td>
+    <td><b>${F(r[4] * r[1] * r[5])} Wh</b></td>
+    <td class="no-print"><button class="btn danger" onclick="data.splice(${i},1);render();calc()">×</button></td>
+  </tr>`).join('');
+}
+
+function chg(i, t, v) {
+  v = N(v); let r = data[i];
+  if (t === 'q') r[1] = R(v);
+  if (t === 'h') r[5] = R(v);
+  if (t === 'v') { r[2] = R(v); r[3] = R(r[2] ? r[4] / r[2] : 0); }
+  if (t === 'a') { r[3] = R(v); r[4] = R(r[2] * r[3]); }
+  if (t === 'p') { r[4] = R(v); r[3] = R(r[2] ? r[4] / r[2] : 0); }
+  calc();
+}
+
+function addRow() {
+  data.push(['Nuevo equipo', 1, 127, 0, 0, 1]);
+  render();
+  calc();
+}
+
+function calc() {
+  let daily = data.reduce((s, r) => s + r[4] * r[1] * r[5], 0);
+  let sun = Math.max(.001, N($('sun').value));
+  let eff = Math.max(.001, N($('eff').value)) / 100;
+  let panel = Math.max(.001, N($('panel').value));
+  let design = daily / eff;
+  let pv = design / sun;
+  let panels = Math.ceil(pv / panel);
+  let installed = panels * panel;
+  let days = Math.max(0, N($('days').value));
+  let storage = daily * days;
+  let maxPower = data.reduce((s, r) => s + r[4] * r[1], 0);
+  let totalA = N($('sysv').value) ? maxPower / N($('sysv').value) : 0;
+  let bv = Math.max(1, N($('batv').value));
+  let dod = Math.min(95, Math.max(50, N($('dod').value))) / 100;
+  let batWh = storage / dod;
+  let batAh = batWh / bv;
+  let inv = maxPower * 1.25;
+  let ctrl = (installed / bv) * 1.25;
+
+  $('daily').textContent = F(daily) + ' Wh';
+  $('design').textContent = F(design) + ' Wh';
+  $('panels').textContent = panels;
+  $('installed').textContent = F(installed) + ' W';
+  $('storage').textContent = F(storage) + ' Wh';
+  $('totalA').textContent = F(totalA) + ' A';
+  $('pvreq').textContent = F(pv) + ' W';
+  $('autonomy').textContent = F(days) + ' días';
+  $('eDay').textContent = F(daily) + ' Wh';
+  $('eWeek').textContent = F(daily * 7) + ' Wh';
+  $('eMonth').textContent = F(daily * 30) + ' Wh';
+  $('eStore').textContent = F(storage) + ' Wh';
+  $('batAh').textContent = F(batAh) + ' Ah';
+  $('batWh').textContent = F(batWh) + ' Wh';
+  $('inv').textContent = F(inv) + ' W';
+  $('ctrl').textContent = F(ctrl) + ' A';
+
+  $('resultFormula').innerHTML = `<b>Paneles:</b> ${F(design)} Wh ÷ (${F(sun)} h × ${F(eff * 100)}%) = ${F(pv)} W → <b>${panels} panel(es)</b> de ${F(panel)} W.`;
+  $('equipFormula').innerHTML = `<b>🔋 Batería:</b> ${F(daily)} Wh/día × ${F(days)} días = ${F(storage)} Wh; considerando ${F(dod * 100)}% de descarga y banco de ${F(bv)} V → <b>${F(batAh)} Ah</b> (${F(batWh)} Wh).<br><b>⚡ Inversor:</b> ${F(maxPower)} W × 1.25 = <b>${F(inv)} W</b>.<br><b>🔌 Controlador:</b> ${F(installed)} W ÷ ${F(bv)} V × 1.25 = <b>${F(ctrl)} A</b>.<br><small style="opacity:0.85">Son valores preliminares: verifica picos de arranque, rango MPPT y especificaciones del fabricante.</small>`;
+}
+
+function saveProject() {
+  let name = $('project').value.trim() || 'Proyecto solar ' + new Date().toLocaleString('es-MX');
+  let item = { name, date: new Date().toLocaleString('es-MX'), data: JSON.parse(JSON.stringify(data)) };
+  localStorage.setItem('solarix:last', JSON.stringify(item));
+  let h = JSON.parse(localStorage.getItem('solarix:history') || '[]');
+  h.unshift(item);
+  localStorage.setItem('solarix:history', JSON.stringify(h.slice(0, 30)));
+  showHistory();
+  alert('Proyecto guardado en el historial local.');
+}
+
+function showHistory() {
+  let h = JSON.parse(localStorage.getItem('solarix:history') || '[]');
+  $('history').innerHTML = h.length ? h.map((x, i) => `
+    <div class="history-item">
+      <div><b>${x.name}</b><br><small style="color:var(--txt-muted)">${x.date}</small></div>
+      <button class="btn danger" onclick="delHist(${i})">Eliminar</button>
+    </div>
+  `).join('') : '<p style="color:var(--txt-muted); font-size:14px;">No hay proyectos guardados en el historial todavía.</p>';
+}
+
+function delHist(i) {
+  let h = JSON.parse(localStorage.getItem('solarix:history') || '[]');
+  h.splice(i, 1);
+  localStorage.setItem('solarix:history', JSON.stringify(h));
+  showHistory();
+}
+
+['sun', 'eff', 'panel', 'sysv', 'days', 'batv', 'dod'].forEach(id => $(id).addEventListener('input', calc));
+
+render();
+showHistory();
+calc();
+
+// --- PWA Installation & Service Worker Integration ---
+let deferredPrompt = null;
+const installBtn = $('pwaInstallBtn');
+const installedBadge = $('installedBadge');
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+if (isStandalone) {
+  installedBadge.style.display = 'inline-flex';
+  installBtn.style.display = 'none';
+} else {
+  // Always display the Quick Install button in header for fast user access
+  installBtn.style.display = 'inline-flex';
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-flex';
+});
+
+function triggerPwaInstall() {
+  if (deferredPrompt) {
+    executeInstallPrompt();
+  } else {
+    // Show modal instructions for iOS or browsers that don't support beforeinstallprompt
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      $('iosInstructions').style.display = 'block';
+      $('modalInstallBtn').style.display = 'none';
+      $('modalDesc').textContent = 'Para instalar SOLARIX en tu iPhone o iPad, sigue estos breves pasos:';
+    } else {
+      $('iosInstructions').style.display = 'none';
+      $('modalInstallBtn').style.display = 'inline-flex';
+      $('modalDesc').textContent = 'Para instalar la app, usa la opción "Instalar aplicación" o "Agregar a la pantalla principal" del menú de tu navegador.';
+    }
+    $('pwaModal').classList.add('active');
+  }
+}
+
+async function executeInstallPrompt() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log(`User choice outcome: ${outcome}`);
+  if (outcome === 'accepted') {
+    installBtn.style.display = 'none';
+    installedBadge.style.display = 'inline-flex';
+  }
+  deferredPrompt = null;
+  closePwaModal();
+}
+
+function closePwaModal() {
+  $('pwaModal').classList.remove('active');
+}
+
+window.addEventListener('appinstalled', () => {
+  console.log('SOLARIX PWA was successfully installed.');
+  installBtn.style.display = 'none';
+  installedBadge.style.display = 'inline-flex';
+  deferredPrompt = null;
+});
+
+// Network status listener
+function updateOnlineStatus() {
+  const statusDot = document.querySelector('.status-dot');
+  const statusText = $('statusText');
+  if (navigator.onLine) {
+    statusDot.style.background = '#2ecc71';
+    statusText.textContent = 'En línea (PWA lista)';
+  } else {
+    statusDot.style.background = '#e74c3c';
+    statusText.textContent = 'Modo Offline activo';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((reg) => console.log('SOLARIX Service Worker registrado con éxito:', reg.scope))
+      .catch((err) => console.error('Error al registrar Service Worker:', err));
+  });
+}
+</script>
+</body>
+</html>
